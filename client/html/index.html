@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- <link rel="icon" href="./rdp/img/favicon.ico"> -->
+
+    <title>Unity|RDP Access</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="./rdp/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom styles for this template -->
+    <link href="./rdp/css/signin.css" rel="stylesheet">
+    <script type="text/javascript" src="./socket.io/socket.io.js"></script>
+	<script type="text/javascript" src="./rdp/js/mstsc.js"></script>
+	<script type="text/javascript" src="./rdp/js/keyboard.js"></script>
+	<script type="text/javascript" src="./rdp/js/rle.js"></script>
+	<script type="text/javascript" src="./rdp/js/client.js"></script>
+	<script type="text/javascript" src="./rdp/js/canvas.js"></script>
+    <script language="javascript">
+	    var client = null;
+	    
+	    function load (canvas) {
+	    	client = Mstsc.client.create(Mstsc.$(canvas));
+	    } 
+	    
+		function connect (ip, domain, username, password) {
+			Mstsc.$("main").style.display = 'none';
+			Mstsc.$("loader").style.visibility = 'visible';
+			
+			var canvas = Mstsc.$("myCanvas");
+			canvas.style.display = 'inline';
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight;
+
+			client.connect(ip, domain, username, password, function (suc) {
+				if(client.error){
+					Mstsc.$("error_message").innerHTML = 'Unable to connect';
+					Mstsc.$("myCanvas").style.display = 'none';
+					Mstsc.$("main").style.display = 'inline';
+				}
+				Mstsc.$("loader").style.visibility = 'hidden';
+			});
+		}
+	</script>
+	<style type="text/css">
+		.connect_button {
+			background-color: #f48e1f !important;
+			border: medium none;
+			border: #f48e1f !important;
+			color: #fff !important;
+		}
+		.sr-only{
+			position: relative;
+		}
+		.disable_fields {
+			pointer-events:none;
+			background-color: lightgray;
+		}
+
+		#loader {
+			width: 100%;
+			height: 100%;
+			top: 0px;
+			left: 0px;
+			position: fixed;
+			display: block;
+			z-index: 99;
+			visibility: hidden;
+			font-size: 40px
+		}
+		#loading-image {
+			position: absolute;
+			top: 40%;
+			left: 45%;
+			z-index: 100
+		}
+		
+	</style>
+  </head>
+  <body onload='load("myCanvas")'>
+  	<div id="loader">
+		<img id="loading-image" src="./rdp/img/loader.gif"/>
+	</div> 
+
+  	<div id="main" class="container">
+		<form class="form-signin"  onSubmit="connect(this.elements['inputIpAddress'].value, this.elements['inputDomain'].value, this.elements['inputUsername'].value, this.elements['inputPassword'].value);return false;">
+			<img class='logo' src="./rdp/img/Unity-Logo.png"></img>
+			<label for="inputIpAddress" class="sr-only">IP Address</label>
+			<label id="error_message" style="color:red;"></label>
+			<input type="text" id="inputIpAddress" class="form-control disable_fields" value="<%- request_obj.ip %>" placeholder="IP Address" required autofocus>
+			<label for="inputDomain" class="sr-only">Domain</label>
+			<input type="text" id="inputDomain" class="form-control disable_fields" placeholder="Domain" value="<%- request_obj.domain%>">
+			<label for="inputUsername" class="sr-only">Username</label>
+			<input type="text" id="inputUsername" class="form-control" placeholder="Username" required>
+			<label for="inputPassword" class="sr-only">Password</label>
+			<input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+			<button class="connect_button btn btn-lg btn-primary btn-block" type="submit">Connect</button>
+		</form>
+    </div> <!-- /container -->
+    <canvas id="myCanvas" style="display:none">
+  </body>
+</html>
